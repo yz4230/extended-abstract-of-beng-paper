@@ -1,0 +1,152 @@
+@misc{rfc8402,
+    series =    {Request for Comments},
+    number =    8402,
+    howpublished =  {RFC 8402},
+    publisher = {RFC Editor},
+    doi =       {10.17487/RFC8402},
+    url =       {https://www.rfc-editor.org/info/rfc8402},
+    author =    {Clarence Filsfils and Stefano Previdi and Les Ginsberg and Bruno Decraene and Stephane Litkowski and Rob Shakir},
+    title =     {{Segment Routing Architecture}},
+    pagetotal = 32,
+    year =      2018,
+    month =     jul,
+    abstract =  {Segment Routing (SR) leverages the source routing paradigm. A node steers a packet through an ordered list of instructions, called "segments". A segment can represent any instruction, topological or service based. A segment can have a semantic local to an SR node or global within an SR domain. SR provides a mechanism that allows a flow to be restricted to a specific topological path, while maintaining per-flow state only at the ingress node(s) to the SR domain. SR can be directly applied to the MPLS architecture with no change to the forwarding plane. A segment is encoded as an MPLS label. An ordered list of segments is encoded as a stack of labels. The segment to process is on the top of the stack. Upon completion of a segment, the related label is popped from the stack. SR can be applied to the IPv6 architecture, with a new type of routing header. A segment is encoded as an IPv6 address. An ordered list of segments is encoded as an ordered list of IPv6 addresses in the routing header. The active segment is indicated by the Destination Address (DA) of the packet. The next active segment is indicated by a pointer in the new routing header.},
+}
+
+@misc{rfc8754,
+  series       = {Request for Comments},
+  number       = 8754,
+  howpublished = {RFC 8754},
+  publisher    = {RFC Editor},
+  doi          = {10.17487/RFC8754},
+  url          = {https://www.rfc-editor.org/info/rfc8754},
+  author       = {Clarence Filsfils and Darren Dukes and Stefano Previdi and John Leddy and Satoru Matsushima and Daniel Voyer},
+  title        = {{IPv6 Segment Routing Header (SRH)}},
+  pagetotal    = 27,
+  year         = 2020,
+  month        = mar,
+  abstract     = {Segment Routing can be applied to the IPv6 data plane using a new type of Routing Extension Header called the Segment Routing Header (SRH). This document describes the SRH and how it is used by nodes that are Segment Routing (SR) capable.}
+}
+
+@misc{rfc8986,
+  series       = {Request for Comments},
+  number       = 8986,
+  howpublished = {RFC 8986},
+  publisher    = {RFC Editor},
+  doi          = {10.17487/RFC8986},
+  url          = {https://www.rfc-editor.org/info/rfc8986},
+  author       = {Clarence Filsfils and Pablo Camarillo and John Leddy and Daniel Voyer and Satoru Matsushima and Zhenbin Li},
+  title        = {{Segment Routing over IPv6 (SRv6) Network Programming}},
+  pagetotal    = 40,
+  year         = 2021,
+  month        = feb,
+  abstract     = {The Segment Routing over IPv6 (SRv6) Network Programming framework enables a network operator or an application to specify a packet processing program by encoding a sequence of instructions in the IPv6 packet header. Each instruction is implemented on one or several nodes in the network and identified by an SRv6 Segment Identifier in the packet. This document defines the SRv6 Network Programming concept and specifies the base set of SRv6 behaviors that enables the creation of interoperable overlays with underlay optimization.}
+}
+
+@misc{rfc9522,
+  series       = {Request for Comments},
+  number       = 9522,
+  howpublished = {RFC 9522},
+  publisher    = {RFC Editor},
+  doi          = {10.17487/RFC9522},
+  url          = {https://www.rfc-editor.org/info/rfc9522},
+  author       = {Adrian Farrel},
+  title        = {{Overview and Principles of Internet Traffic Engineering}},
+  pagetotal    = 73,
+  year         = 2024,
+  month        = jan,
+  abstract     = {This document describes the principles of traffic engineering (TE) in the Internet. The document is intended to promote better understanding of the issues surrounding traffic engineering in IP networks and the networks that support IP networking and to provide a common basis for the development of traffic-engineering capabilities for the Internet. The principles, architectures, and methodologies for performance evaluation and performance optimization of operational networks are also discussed. This work was first published as RFC 3272 in May 2002. This document obsoletes RFC 3272 by making a complete update to bring the text in line with best current practices for Internet traffic engineering and to include references to the latest relevant work in the IETF.}
+}
+
+@misc{rfc9256,
+    series =    {Request for Comments},
+    number =    9256,
+    howpublished =  {RFC 9256},
+    publisher = {RFC Editor},
+    doi =       {10.17487/RFC9256},
+    url =       {https://www.rfc-editor.org/info/rfc9256},
+    author =    {Clarence Filsfils and Ketan Talaulikar and Daniel Voyer and Alex Bogdanov and Paul Mattes},
+    title =     {{Segment Routing Policy Architecture}},
+    pagetotal = 35,
+    year =      2022,
+    month =     jul,
+    abstract =  {Segment Routing (SR) allows a node to steer a packet flow along any path. Intermediate per-path states are eliminated thanks to source routing. SR Policy is an ordered list of segments (i.e., instructions) that represent a source-routed policy. Packet flows are steered into an SR Policy on a node where it is instantiated called a headend node. The packets steered into an SR Policy carry an ordered list of segments associated with that SR Policy. This document updates RFC 8402 as it details the concepts of SR Policy and steering into an SR Policy.},
+}
+
+@inproceedings{8584942,
+  author    = {Desmouceaux, Yoann and Townsley, Mark and Clausen, Thomas Heide},
+  booktitle = {2018 14th International Conference on Network and Service Management (CNSM)},
+  title     = {Zero-Loss Virtual Machine Migration with IPv6 Segment Routing},
+  year      = {2018},
+  volume    = {},
+  number    = {},
+  pages     = {420-425},
+  keywords  = {Logic gates;Routing;Virtual machine monitors;Servers;Packet loss;Conferences},
+  doi       = {}
+}
+
+@article{8293698,
+  author   = {Desmouceaux, Yoann and Pfister, Pierre and Tollet, Jérôme and Townsley, Mark and Clausen, Thomas},
+  journal  = {IEEE/ACM Transactions on Networking},
+  title    = {6LB: Scalable and Application-Aware Load Balancing with Segment Routing},
+  year     = {2018},
+  volume   = {26},
+  number   = {2},
+  pages    = {819-834},
+  keywords = {Servers;Routing;Monitoring;Protocols;IEEE transactions;IP networks;Dispatching;Load-balancing;segment routing (SR);ipv6;application-aware;consistent hashing;performance evaluation},
+  doi      = {10.1109/TNET.2018.2799242}
+}
+@misc{ebpfdocs_bpf_prog_type_lwt_xmit,
+  title        = {{Program Type 'BPF\_PROG\_TYPE\_LWT\_XMIT' - eBPF Docs}},
+  howpublished = {\url{https://docs.ebpf.io/linux/program-type/BPF_PROG_TYPE_LWT_XMIT/}},
+  note         = {Accessed: 2025-01-17}
+}
+
+@misc{manpage_network_namespaces,
+  title        = {{network\_namespaces(7) - Linux manual page}},
+  howpublished = {\url{https://man7.org/linux/man-pages/man7/network_namespaces.7.html}}
+}
+
+@misc{manpage_tc,
+  title        = {{tc(8) - Linux manual page}},
+  howpublished = {\url{https://man7.org/linux/man-pages/man8/tc.8.html}}
+}
+
+@misc{homepage_iperf,
+  title        = {{iPerf - The TCP, UDP and SCTP network bandwidth measurement tool}},
+  howpublished = {\url{https://iperf.fr/}}
+}
+
+@misc{cisco_rakuten_srv6,
+  author = {Cisco},
+  title = {Rakuten Mobile and Cisco began full-scale operations of mobile and other networks by implementing SRv6 uSID},
+  howpublished = {\url{https://news-blogs.cisco.com/apjc/ja/2024/07/29/}},
+  note = {Accessed: 2025-01-23}
+}
+
+@misc{softbank_srv6,
+  author = {SoftBank},
+  title = {Completion of SRv6 Nationwide Deployment and Introduction of Network Slicing with New Feature "SRv6 Flex-Algo" to Commercial Network - New Technology Realizing Further Efficiency and Enhanced Functionality of 5G Networks},
+  howpublished = {\url{https://www.softbank.jp/corp/news/press/sbkk/2022/20220426_01/}},
+  note = {Accessed: 2025-01-23}
+}
+
+@article {D17, 
+	title = {IPv6 Segment Routing in the Linux kernel},
+	journal = {Linux Weekly News (LWN)},
+	volume = {2017},
+	author = {David Lebrun},
+	year = {2017},
+	month = {May 17},
+	note = {See https://lwn.net/Articles/722804/},
+}
+
+@inproceedings {DO17, 
+	title = {Implementing IPv6 Segment Routing in the Linux Kernel},
+	booktitle = {Applied Networking Research Workshop 2017},
+	author = {David Lebrun and Olivier Bonaventure},
+	year = {2017},
+	month = {July},
+	note = {See https://irtf.org/anrw/2017/anrw17-final3.pdf},
+}
+

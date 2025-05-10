@@ -1,0 +1,192 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage[utf8]{inputenc}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{bytefield}
+\usepackage{url}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Enabling Adaptive Source Routing with Custom SRv6 Function}
+
+\author{\IEEEauthorblockN{Yuzuki Ishiyama (ID:2531008)}
+  \IEEEauthorblockA{\textit{Yamaki Laboratory} \\
+    \textit{Information and Network Engineering}}
+}
+
+\maketitle
+
+\begin{abstract}
+  Segment Routing over IPv6 (SRv6) has gained attention as a flexible routing mechanism to meet the diverse requirements of modern networks.
+  However, SRv6 has an inherent limitation: routing decisions are made statically at the source, making it impossible to adapt to network conditions that change after packets are transmitted.
+  This paper proposes a novel approach to implement adaptive source routing using SRv6 Functions.
+  By encoding conditional logic directly into the segment list, our method enables dynamic path selection based on real-time network metrics without relying on additional control packets.
+  We implemented our approach on Linux routers using extended Berkeley Packet Filter (eBPF) and demonstrated its feasibility through experimental evaluation.
+  Compared to a conventional probe-based approach, our method showed 43.1\% higher throughput and more stable network performance.
+  The implementation overhead was minimal, with only 3.2\% protocol size increase and 1.04\% throughput reduction due to eBPF execution.
+\end{abstract}
+
+\begin{IEEEkeywords}
+  service function chaining, segment routing, SRv6, QoS
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+Internet Service Providers (ISPs) are increasingly adopting source routing technologies to implement diverse routing policies for different applications\cite{cisco_rakuten_srv6}\cite{softbank_srv6}.
+Source routing, where the sender specifies the packet forwarding path, offers improved scalability and control compared to traditional hop-by-hop forwarding.
+With source routing, ISPs can efficiently provide paths with high bandwidth for some applications and low latency for others.
+Segment Routing over IPv6 (SRv6) is an emerging protocol that implements source routing by embedding path information in IPv6 extension headers.
+Compared to other technologies, SRv6 is easier to deploy in IPv6 networks and is therefore widely adopted.
+However, a fundamental limitation of source routing is that routes must be determined when packets are sent, making it impossible to adapt to network conditions that change after transmission.
+This paper proposes a method to overcome this limitation by encoding conditional logic directly into SRv6's Segment List.
+By leveraging SRv6 Functions, our approach enables dynamic path selection based on real-time network metrics without requiring additional control messages.
+
+\section{Background}
+
+\subsection{Traditional IP Routing}
+
+In traditional IP routing, routers make forwarding decisions only based on the destination address in the packet header.
+Each router independently looks up its routing table to determine the next hop, resulting in a hop-by-hop forwarding mechanism.
+This approach is simple, however, this model has limitations in implementing complex routing policies, as intermediate routers cannot know the application requirements or end-to-end path characteristics.
+
+\subsection{Source Routing and SRv6}
+
+Source routing allows the sender to specify the entire path a packet should take through the network.
+This paradigm provides application-specific routing with scalability and flexibility.
+
+However, source routing has a fundamental limitation, as the routing decisions are made statically at the source, making it impossible to adapt to network conditions that change after packets are transmitted.
+
+SRv6 implements source routing by appending a Segment Routing Header (SRH) to IPv6 packets\cite{rfc8754}\cite{rfc9256}.
+The SRH contains a Segment List, which is a sequence of Segment Identifiers (SIDs) representing the nodes to be traversed.
+In most cases, SIDs are IPv6 addresses.
+
+Segment List can also include SRv6 Functions, which are instructions that specify operations when the packet reaches a specific node.
+Each instruction is encoded in the format of an IPv6 address, which is divided into three parts: Locator, Function, and Arguments.
+Figure \ref{fig:example-of-dividing-an-SRv6-address} illustrates the structure of an SRv6 address.
+Locator points to the node where the function is executed, while Function and Arguments specify the operation to be performed at the node.
+
+% show locator, function, and arguments in a bytefield
+% | 128 bits                       |
+% | 64 bits | 16 bits  | 48 bits   |
+% | Locator | Function | Arguments |
+
+\begin{figure}[htbp]
+  \centering
+  \begin{bytefield}[bitwidth=0.18em]{128}
+    \bitheader{0, 16, 32, 48, 64, 80, 96, 112, 128} \\
+    \bitbox{64}{\small LOC} & \bitbox{16}{\small FUNC} & \bitbox{48}{\small ARG} \\
+  \end{bytefield}
+  \caption{Example of dividing an SRv6 address}
+  \label{fig:example-of-dividing-an-SRv6-address}
+\end{figure}
+
+\section{Proposed Method}
+\subsection{Encoding Conditions in SRv6 Function}
+
+The fundamental concept is to include multiple potential paths in the Segment List, along with logic that determines which path to take based on network metrics.
+
+Two new SRv6 Functions are defined to implement conditional logic in the Segment List.
+To realize this concept, we define two complementary functions:
+
+\begin{itemize}
+  \item \textbf{\textit{skip\_segments\_if}}: Conditionally skips a specified number of segments based on a metric. \\
+        \textbf{Arguments:}
+        \begin{itemize}
+          \item Skip count: Number of segments to skip
+          \item Metric type: Metric used for evaluation
+          \item Metric-specific value: Value used for evaluation
+        \end{itemize}
+
+  \item \textbf{\textit{skip\_segments}}: Just skips a specified number of segments. \\
+        \textbf{Arguments:}
+        \begin{itemize}
+          \item Skip count: Number of segments to skip
+        \end{itemize}
+\end{itemize}
+
+With these two functions, the logical structure:
+\begin{verbatim}
+  if (condition at router A) is True:
+    go to router B
+  else:
+    go to router C
+\end{verbatim}
+
+can be expressed as following segment list:
+
+\begin{verbatim}
+  1. A:skip_segments_if(skip=1, condition)
+  2. C:skip_segments(skip=1)
+  3. B
+\end{verbatim}
+
+\textit{skip\_segments\_if} at router A checks the condition and skips the next segment if the condition is met, otherwise it continues to the next segment (router C).
+\textit{skip\_segments} at router C is required packets not to be forwarded to router B, which is the route for the condition being met.
+
+\subsection{Implementation}
+
+This method was implemented on Linux routers using eBPF.
+The implementation consists of two main components:
+\begin{itemize}
+  \item \textbf{SRv6 Function Implementation}: The SRv6 Functions are implemented as eBPF programs that are registered in routing tables.
+  \item \textbf{Metric Collection}: The metric collection module gathers real-time network metrics and provides them to the SRv6 Functions for evaluation.
+\end{itemize}
+
+To reduce noise in metric measurements, we used exponential moving average (EMA) to smooth the metrics.
+The EMA is calculated using the formula:
+
+\begin{equation}
+  \text{EMA}_t = \alpha \cdot x_t + (1 - \alpha) \cdot \text{EMA}_{t-1}
+\end{equation}
+
+where \(x_t\) is the current measurement, \(\text{EMA}_{t-1}\) is the previous EMA value, and \(\alpha\) is the smoothing factor.
+
+\section{Evaluation}
+\subsection{Experimental Setup}
+
+We evaluated our method using a network topology with multiple potential paths between source and destination nodes. The Linux routers ran our eBPF implementation, and network namespaces, one of the linux features, are used for virtualization, tc for bandwidth/delay control, and iperf3 for traffic generation.
+
+The proposed method was evaluated using two scenarios:
+
+\begin{itemize}
+  \item \textbf{Scenario 1}: A single TCP flow that exceeds the threshold, requiring path switching.
+  \item \textbf{Scenario 2}: Two TCP flows competing for bandwidth, with dynamic path selection.
+\end{itemize}
+
+For comparison, the probe-based approach was also implemented using a separate control packet to probe the network condition.
+
+\subsection{Results}
+
+In Scenario 1, the proposed method achieved 43.1\% higher throughput compared to the conventional probe-based approach.
+The performance improvement was attributed to the immediate path switching based on real-time metrics, which avoids TCP congestion control.
+
+In Scenario 2, our method maintained more stable bandwidth utilization across flows compared to the probe-based approach.
+
+The implementation overhead was minimal:
+
+\begin{itemize}
+  \item Protocol size increase: 3.2\%
+  \item Throughput reduction due to eBPF execution: 1.04\%
+\end{itemize}
+
+\section{Conclusion}
+
+We proposed and implemented an adaptive source routing method using SRv6 Functions that enables dynamic path selection based on real-time network metrics.
+By encoding conditional logic directly into the Segment List, each router can make forwarding decisions based on the current network conditions.
+
+Experimental results demonstrated higher throughput and more stable performance compared to a conventional probe-based approach with minimal overhead.
+
+Future work includes supporting additional metrics and more complex conditions.
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+\end{document}

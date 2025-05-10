@@ -1,0 +1,32 @@
+{
+	"editor.formatOnSave": true,
+	"editor.unicodeHighlight.allowedCharacters": {
+		"，": true,
+		"．": true
+	},
+	"emeraldwalk.runonsave": {
+		"commands": [
+			{
+				"cmd": "python3 scripts/replace-punctuation.py ${file}",
+				"match": "\\.tex$"
+			}
+		]
+	},
+	"latex-workshop.formatting.latex": "latexindent",
+	"latex-workshop.latex.outDir": "artifacts",
+	"latex-workshop.latex.recipe.default": "latexmk",
+	"latex-workshop.latex.recipes": [
+		{
+			"name": "latexmk",
+			"tools": ["latexmk"]
+		}
+	],
+	"latex-workshop.latex.tools": [
+		{
+			"args": ["build"],
+			"command": "task",
+			"env": {},
+			"name": "latexmk"
+		}
+	]
+}
