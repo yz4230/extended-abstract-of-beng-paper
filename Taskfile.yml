@@ -8,6 +8,11 @@ tasks:
     sources:
       - main-en.tex
     cmd: latexmk -pdf main-en.tex {{.LATEXMK_ARGS}}
+  submit:
+    deps:
+      - build-en
+    # Uto-2500001-TaroDentsu-EA.pdf
+    cmd: cp artifacts/main-en.pdf artifacts/Yamaki-2531008-YuzukiIshiyama-EA.pdf
   replace-punctuation:
     cmd: fd -e tex -x python3 scripts/replace-punctuation.py {}
 vars:
