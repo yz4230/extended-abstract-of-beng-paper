@@ -31,39 +31,40 @@
   By directly encoding path branching conditions into the segment list, this method enables dynamic path selection based on real-time network metrics without relying on additional control packets.
   We implemented this method on Linux routers using eBPF and demonstrated its feasibility through experimental evaluation.
   Compared to conventional probe-based methods, our approach showed 43.1\% higher throughput and more stable network performance.
-  The throughput reduction due to overhead was 1.04%.
+  The throughput reduction due to overhead was 1.04\%.
 \end{abstract}
 
 \begin{IEEEkeywords}
-  service function chaining, segment routing, SRv6, QoS
+  function chaining, segment routing, SRv6, QoS
 \end{IEEEkeywords}
 
 \section{Introduction}
 
-Internet Service Providers (ISPs) are increasingly adopting source routing technologies to implement diverse routing policies for various applications \cite{cisco_rakuten_srv6}\cite{softbank_srv6}.
-Source routing, where the source specifies the path a packet should take, offers improved scalability and controllability compared to traditional hop-by-hop forwarding.
-Segment Routing over IPv6 (SRv6) is a protocol that implements source routing by embedding path information in an IPv6 extension header.
-SRv6 is widely adopted due to its ease of deployment in IPv6 networks compared to other technologies.
+Internet service providers increasingly adopt source routing for diverse application routing policies \cite{cisco_rakuten_srv6}\cite{softbank_srv6}.
+Source routing, with source-specified paths, improves scalability and control over traditional hop-by-hop forwarding.
+Segment Routing over IPv6 (SRv6) implements source routing by embedding path information in IPv6 extension headers.
+SRv6 is widely adopted for easier IPv6 deployment than other technologies.
 
-However, source routing has a fundamental limitation: path decisions must be made when a packet is sent, making it unable to adapt to network conditions that change after transmission.
-This research proposes a method to overcome this limitation by directly encoding path branching conditions into the SRv6 segment list.
-This approach enables dynamic path selection based on real-time network metrics without requiring additional control messages.
+However, source routing's static path decisions at transmission prevent adaptation to later network condition changes.
+This research proposes overcoming this by directly encoding path branching conditions into the SRv6 segment list for improving quality of service.
+This enables dynamic path selection using real-time network metrics, without extra control messages.
 
 \section{Background}
 
 \subsection{Source Routing and Potential Issues}
 
-Traditional IP routing faces challenges in implementing complex routing policies.
-This is because each router refers only to the destination address in the packet header and independently determines the next hop based on its own routing table.
-Consequently, intermediate routers cannot perform path selection that considers application requirements or end-to-end path characteristics.
+Traditional IP routing struggles with complex routing policies.
+Each router, using only the destination address and its routing table, independently determines the next hop.
+Therefore, intermediate routers cannot select paths considering application needs or end-to-end characteristics.
 
-Source routing addresses the aforementioned problems, allowing the sender to specify the complete path a packet should traverse through the network.
-This paradigm provides application-specific routing with scalability and flexibility. SRv6 implements source routing by adding a Segment Routing Header (SRH) to IPv6 packets \cite{rfc8754}\cite{rfc9256}.
-The SRH contains a segment list, which is a sequence of Segment Identifiers (SIDs) representing the nodes to be traversed.
-In most cases, SIDs are IPv6 addresses.
+Source routing solves these issues by letting the sender specify the packet's complete path.
+This offers scalable and flexible application-specific routing.
+SRv6 implements source routing via a Segment Routing Header (SRH) in IPv6 packets \cite{rfc8754}\cite{rfc9256}.
+The SRH includes a segment list, a sequence of Segment Identifiers (SIDs) for nodes to traverse.
+Typically, SIDs are IPv6 addresses.
 
 However, source routing has a fundamental limitation.
-Routing decisions are made statically at the source, making it impossible to adapt to network conditions that change after packet transmission.
+Static source-based routing decisions prevent adaptation to network changes post-transmission.
 
 \subsection{SRv6 Function}
 
