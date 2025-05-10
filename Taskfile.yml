@@ -1,8 +1,12 @@
 version: "3"
 tasks:
   build:
+    sources:
+      - main.tex
     cmd: latexmk -pdf main.tex {{.LATEXMK_ARGS}}
   build-en:
+    sources:
+      - main-en.tex
     cmd: latexmk -pdf main-en.tex {{.LATEXMK_ARGS}}
   replace-punctuation:
     cmd: fd -e tex -x python3 scripts/replace-punctuation.py {}
